@@ -1,30 +1,18 @@
-var entity = require("./entity");
+var Map = require("./map");
+var Entity = require("./entity");
 var php = require("./php");
 
 
-function Result () {
+function Result() {
 	this.key = 0;
 	this.value = null;
 	this.add = function (key, value) {
 		if (this.value === null) {
-			this.value = {};
+			this.value = new Map();
 		}
-		if (key === null) {
-			this.value[this.key++] = value;
-			return true;
-		}
-		if (key in this.value) {
-			return false;
-
-		}
-		var number = parseInt(key * 1);
-		if (!isNaN(number) && number > this.key) {
-			this.key = number;
-		}
-		this.value[key] = value;
-		return true;
+		return this.value.add(key, value);
 	};
-};
+}
 
 
 function decoder() {
@@ -51,14 +39,14 @@ function decoder() {
 		} else if (input.substr(0, 3) == "\xEF\xBB\xBF") { // BOM
 			input = input.substr(3);
 		}
-		this.input = "\n" + "" + input.replace("\r", "") + "\n"; // \n forces indent detection
+		this.input = "\n" + "" + input.replace("\r", ""); // \n forces indent detection
 
-		var pattern = '~^(' + "" + decoder.patterns.join(')|(') + "" + ')~mi';
+		var pattern = '~(' + "" + decoder.patterns.join(')|(') + "" + ')~mi';
 		this.tokens = php.preg_split(pattern, this.input, -1, 1 | 2 | 4);
 
 		var last = this.tokens[this.tokens.length - 1];
 		if (this.tokens && !php.preg_match(pattern, last[0], [])) {
-			pos = this.tokens.length - 1;
+			this.pos = this.tokens.length - 1;
 			this.error();
 		}
 
@@ -75,14 +63,14 @@ function decoder() {
 		var flatten = function (res) {
 			if (res instanceof Result) {
 				return flatten(res.value);
-			} else if(res instanceof entity.Entity) {
+			} else if (res instanceof Entity) {
 				res.attributes = flatten(res.attributes);
 				res.value = flatten(res.value);
-			} else if(res instanceof Object) {
-				var result = {};
-				for(i in res) {
-					result[i] = flatten(res[i]);
-				}
+			} else if (res instanceof Map) {
+				var result = new Map;
+				res.forEach(function (key, value) {
+					result.set(key, flatten(value));
+				});
 				return result;
 			}
 			return res;
@@ -103,7 +91,7 @@ function decoder() {
 		if (typeof key === "undefined") {
 			key = null;
 		}
-		if(typeof defaultValue === "undefined") {
+		if (typeof defaultValue === "undefined") {
 			defaultValue = null;
 		}
 
@@ -135,7 +123,7 @@ function decoder() {
 
 				} else if (hasKey && key == null && hasValue && !inlineParser) {
 					this.pos++;
-					this.addValue(result, null, this.parse(indent + "" + '  ', {}, value, true));
+					this.addValue(result, null, this.parse(indent + "" + '  ', new Map(), value, true));
 					var newIndent = (tokens[this.pos], tokens[this.pos + 1]) ? tokens[this.pos][0].substr(1) : ''; // not last
 					if (newIndent.length > indent.length) {
 						this.pos++;
@@ -168,20 +156,14 @@ function decoder() {
 						this.error();
 					}
 					this.pos++;
-					if (value instanceof entity.Entity && value.value === decoder.CHAIN) {
-						(function(obj) {
-							var last = null;
-							for(var i in obj) {
-								last = obj[i];
-							}
-							return last;
-						})(value.attributes.value).attributes = this.parse(false, {});
+					if (value instanceof Entity && value.value === decoder.CHAIN) {
+						value.attributes.value.last().value.attributes = this.parse(false, new Map());
 					} else {
-						value = new entity.Entity(value, this.parse(false, {}));
+						value = new Entity(value, this.parse(false, new Map()));
 					}
 				} else {
 					this.pos++;
-					value = this.parse(false, {});
+					value = this.parse(false, new Map());
 				}
 				hasValue = true;
 				if (tokens[this.pos] === undefined || tokens[this.pos][0] !== decoder.brackets[t]) { // unexpected type of bracket or block-parser
@@ -224,7 +206,7 @@ function decoder() {
 							this.pos++;
 							this.error('Bad indentation');
 						}
-						this.addValue(result, key, this.parse(newIndent, {}));
+						this.addValue(result, key, this.parse(newIndent, new Map));
 						newIndent = (tokens[this.pos] !== undefined && tokens[this.pos + 1] !== undefined) ? tokens[this.pos][0].substr(1) : ''; // not last
 						if (newIndent.length > indent.length) {
 							this.pos++;
@@ -233,13 +215,14 @@ function decoder() {
 						hasKey = false;
 
 					} else {
-						if (hasValue && !hasKey) { // block items must have "key"; NULL key means list item
+						if (hasValue && !hasKey) { // block items must have "key"; NULL _key means list item
 							break;
 
 						} else if (hasKey) {
 							this.addValue(result, key, hasValue ? value : null);
 							if (key !== null && !hasValue && newIndent === indent) {
-								result = result.value[key] = new Result;
+								result.value.set(key, new Result);
+								result = result.value.get(key);
 							}
 
 							hasKey = hasValue = false;
@@ -252,13 +235,13 @@ function decoder() {
 				}
 
 			} else if (hasValue) { // Value
-				if (value instanceof entity.Entity) { // Entity chaining
+				if (value instanceof Entity) { // Entity chaining
 					if (value.value !== decoder.CHAIN) {
 						var attributes = new Result();
 						attributes.add(null, value);
-						value = new entity.Entity(decoder.CHAIN, attributes);
+						value = new Entity(decoder.CHAIN, attributes);
 					}
-					value.attributes.add(null, new entity.Entity(t));
+					value.attributes.add(null, new Entity(t));
 				} else {
 					this.error();
 				}
@@ -270,7 +253,7 @@ function decoder() {
 						'null': 0, 'Null': 0, 'NULL': 0
 					};
 				if (t[0] === '"') {
-					value = t.substr(1, t.length - 2).replace(/#\\\\(?:u[0-9a-f]{4}|x[0-9a-f]{2}|.)/i, function(whole, sq) {
+					value = t.substr(1, t.length - 2).replace(/#\\\\(?:u[0-9a-f]{4}|x[0-9a-f]{2}|.)/i, function (whole, sq) {
 						var mapping = {'t': "\t", 'n': "\n", 'r': "\r", 'f': "\x0C", 'b': "\x08", '"': '"', '\\': '\\', '/': '/', '_': "\xc2\xa0"};
 						if (mapping[sq[1]] !== undefined) {
 							return mapping[sq[1]];
@@ -284,11 +267,12 @@ function decoder() {
 					});
 				} else if (t[0] === "'") {
 					value = t.substr(1, t.length - 2);
-				} else if ((this.parse.consts[t]) !== undefined && (tokens[this.pos + 1][0] === undefined || (tokens[this.pos + 1][0] !== ':' && tokens[this.pos + 1][0] !== '='))) {
+				} else if (typeof this.parse.consts[t] !== "undefined"
+					&& (typeof tokens[this.pos + 1] === "undefined" || (typeof tokens[this.pos + 1] !== "undefined" && tokens[this.pos + 1][0] !== ':' && tokens[this.pos + 1][0] !== '='))) {
 					value = this.parse.consts[t] === 0 ? null : this.parse.consts[t];
 				} else if (!isNaN(t)) {
 					value = t * 1;
-				} else if (php.preg_match('#^\\d\\d\\d\\d-\\d\\d?-\\d\\d?(?:(?:[Tt]| +)\\d\\d?:\\d\\d:\\d\\d(?:\\.\\d*)? *(?:Z|[-+]\\d\\d?(?::\\d\\d)?)?)?\\z#', t)) {
+				} else if (t.match(/^\d\d\d\d-\d\d?-\d\d?(?:(?:[Tt]| +)\d\d?:\d\d:\d\d(?:\.\d*)? *(?:Z|[-+]\d\d?(?::\d\d)?)?)?$/)) {
 					value = new Date(t);
 				} else { // literal
 					value = t;
@@ -323,8 +307,6 @@ function decoder() {
 	};
 
 
-
-
 	this.error = function (message) {
 		if (typeof message === "undefined") {
 			message = "Unexpected '%s'";
@@ -342,8 +324,8 @@ function decoder() {
 }
 
 decoder.patterns = [
-	"'[^'\\n]*' |\t\"(?: \\\\. | [^\"\\\\\\n] )*\"",
-	"(?: [^#\"',:=[\\]{}()\\x00-\\x20!`-] | [:-][^\"',\\]})\\s] )(?:[^,:=\\]})(\\x00-\\x20]+ |:(?! [\\s,\\]})] | $ ) |[\\ \\t]+ [^#,:=\\]})(\\x00-\\x20])*",
+	"'[^'\\n]*'|\"(?:\\.|[^\"\\\\\\n])*\"",
+	"(?:[^\\x00-\\x20#\"',:=[\\]{}()!`-]|[:-][^\"',\\]})\\s])(?:[^\\x00-\\x20,:=\\]})(]+|:(?![\\s,\\]})]|$)|[\\ \\t]+[^\\x00-\\x20#,:=\\]})(])*",
 	"[,:=[\\]{}()-]",
 	"?:\\#.*",
 	"\\n[\\t\\ ]*",

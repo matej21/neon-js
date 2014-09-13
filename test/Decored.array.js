@@ -1,34 +1,36 @@
 var assert = require('assert');
+var assertNeon = require('../src/assert');
 var neon = require('../src/neon');
+
 suite('Decoder.array', function () {
 	test('empty list', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			a: {}
 		}, neon.decode(
 			"a: []\n"
 		))
 	});
 	test('empty value', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			a: null,
 			b: 1
 		}, neon.decode(
 			"a: \n" +
-			"b:1\n"
+			"b: 1\n"
 		))
 	});
 	test('1', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			a: {0: 1, 1: 2},
 			b: 1
 		}, neon.decode(
 			"\n" +
 			"a: {1, 2, }\n" +
-			"b:1"
+			"b: 1"
 		));
 	});
 	test('2', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			a: 1,
 			b: 2
 		}, neon.decode(
@@ -37,7 +39,7 @@ suite('Decoder.array', function () {
 		));
 	});
 	test('3', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			a: "x",
 			0: "x"
 		}, neon.decode(
@@ -47,7 +49,7 @@ suite('Decoder.array', function () {
 		));
 	});
 	test('4', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			0: "x",
 			a: "x"
 		}, neon.decode(
@@ -57,7 +59,7 @@ suite('Decoder.array', function () {
 		));
 	});
 	test('5', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			a: {0: 1, 1: {0: 2}},
 			b: {0: 3},
 			c: null,
@@ -75,7 +77,7 @@ suite('Decoder.array', function () {
 		));
 	});
 	test('5', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			x: {0: "x", a: "x"}
 		}, neon.decode("\n" +
 			"x:\n" +
@@ -84,7 +86,7 @@ suite('Decoder.array', function () {
 		));
 	});
 	test('6', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			x: {y: {0: null}},
 			a: "x"
 		}, neon.decode(
@@ -95,7 +97,7 @@ suite('Decoder.array', function () {
 		));
 	});
 	test('7', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			x: {a: 1, b: 2}
 		}, neon.decode(
 			"\n" +
@@ -106,7 +108,7 @@ suite('Decoder.array', function () {
 		));
 	});
 	test('8', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			0: "one",
 			1: "two"
 		}, neon.decode(
@@ -118,7 +120,7 @@ suite('Decoder.array', function () {
 		));
 	});
 	test('9', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			0: {x: 20, 0: {a: 10, b: 10}},
 			1: {arr: {0: 10, 1: 20}},
 			2: "y"
@@ -134,7 +136,7 @@ suite('Decoder.array', function () {
 		));
 	});
 	test('10', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			root: {0: {key1: null, key3: 123}}
 		}, neon.decode(
 			"\n" +
@@ -145,7 +147,7 @@ suite('Decoder.array', function () {
 		))
 	});
 	test('11', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			0: {x: {a: 10}}
 		}, neon.decode(
 			"\n" +
@@ -154,7 +156,7 @@ suite('Decoder.array', function () {
 		));
 	});
 	test('12', function () {
-		assert.deepEqual({
+		assertNeon.equal({
 			x: {a: 10},
 			y: {b: 20}
 		}, neon.decode(
@@ -166,7 +168,7 @@ suite('Decoder.array', function () {
 		))
 	});
 	test('13', function() {
-		assert.deepEqual({
+		assertNeon.equal({
 			0: {"null": 42},
 			"null": 42
 		}, neon.decode(

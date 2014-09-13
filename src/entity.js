@@ -1,4 +1,4 @@
-module.exports.Entity = function (value, attrs) {
+module.exports = function (value, attrs) {
 
 	this.value = null;
 	this.attributes = null;
