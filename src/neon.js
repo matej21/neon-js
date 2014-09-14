@@ -19,3 +19,4 @@ module.exports.decode = function (input) {
 module.exports.Entity = require('./entity');
 module.exports.Map = require('./map');
 module.exports.CHAIN = DecoderClass.CHAIN;
+module.exports.BLOCK = EncoderClass.BLOCK;

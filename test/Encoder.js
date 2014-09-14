@@ -100,4 +100,26 @@ suite('Encoder', function () {
 			neon.encode(entity)
 		);
 	});
+
+	test('block', function () {
+		assert.equal("- foo\n" +
+		"- bar\n", neon.encode(["foo", "bar"], neon.BLOCK));
+	});
+	test('block 2', function () {
+		assert.equal("x: foo\n" +
+		"y: bar\n", neon.encode({x: "foo", y: "bar"}, neon.BLOCK));
+	});
+	test('block 3', function () {
+		assert.equal("x: foo\n" +
+		"y:\n" +
+		"	- 1\n" +
+		"	- 2\n", neon.encode({x: "foo", y: [1,2]}, neon.BLOCK));
+	});
+	test('block 5', function () {
+		assert.equal("x: foo\n" +
+		"y:\n" +
+		"	- 1\n" +
+		"	- 2\n", neon.encode({x: "foo", y: [1, 2]}, neon.BLOCK));
+	});
+
 });

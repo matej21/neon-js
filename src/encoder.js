@@ -3,8 +3,6 @@ var Decoder = require('./decoder');
 var Map = require('./map');
 
 function encoder() {
-	BLOCK = 1;
-
 	/**
 	 * Returns the NEON representation of a value.
 	 * @param  xvar mixed
@@ -57,15 +55,15 @@ function encoder() {
 				}
 				if (options & encoder.BLOCK) {
 					v = this.encode(v, encoder.BLOCK);
-					s += (isList ? '-' : encoder.encode(k) + "" + ':')
-					+ "" + (v.indexOf("\n") === false ? ' ' + "" + v : "\n\t" + "" + v.replace("\n", "\n\t"))
+					s += (isList ? '-' : this.encode(k) + "" + ':')
+					+ "" + (v.indexOf("\n") === -1 ? (' ' + "" + v) : "\n\t" + "" + v.replace("\n", "\n\t"))
 					+ "" + "\n";
 				} else {
 					s += (isList ? '' : this.encode(k) + "" + ': ') + "" + this.encode(v) + "" + ', ';
 				}
 			}
 			if (options & encoder.BLOCK) {
-				return s;
+				return s.trim() + "\n";
 			} else {
 				return (isList ? '[' : '{') + "" + s.substr(0, s.length - 2) + "" + (isList ? ']' : '}');
 			}
@@ -82,5 +80,6 @@ function encoder() {
 
 
 }
+encoder.BLOCK = 1;
 
 module.exports = encoder;
