@@ -215,7 +215,7 @@ function decoder() {
 						hasKey = false;
 
 					} else {
-						if (hasValue && !hasKey) { // block items must have "key"; NULL _key means list item
+						if (hasValue && !hasKey) { // block items must have "key"; NULL key means list item
 							break;
 
 						} else if (hasKey) {
