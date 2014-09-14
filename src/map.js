@@ -15,11 +15,11 @@ function Map() {
 		} else {
 			var number = parseInt(key * 1);
 			if (!isNaN(number) && number > this._key) {
-				this._key = number;
+				this._key = number + 1;
 			}
 		}
 		if (typeof this._indexes[key] === "undefined") {
-			this._items[this.length] = {_key: key, value: value};
+			this._items[this.length] = {key: key, value: value};
 			this._indexes[key] = this.length;
 			this.length++;
 			return 1;
@@ -42,8 +42,8 @@ function Map() {
 		return this._items[this._indexes[key]].value;
 	};
 
-	this.last = function() {
-		if(this.length === 0) {
+	this.last = function () {
+		if (this.length === 0) {
 			throw new Error("Map has no items");
 		}
 		return this._items[this.length - 1];
@@ -69,7 +69,7 @@ function Map() {
 	this.keys = function () {
 		var keys = [];
 		for (var i in this._items) {
-			keys.push(this._items[i]._key);
+			keys.push(this._items[i].key);
 		}
 		return keys;
 	};
@@ -89,7 +89,7 @@ function Map() {
 		var result = {};
 		for (var i in this._items) {
 			var value = this._items[i].value;
-			result[this._items[i]._key] = value instanceof Map && deep ? value.toObject(true) : value;
+			result[this._items[i].key] = value instanceof Map && deep ? value.toObject(true) : value;
 		}
 
 		return result;
@@ -97,16 +97,36 @@ function Map() {
 
 	this.forEach = function (callable) {
 		for (var i in this._items) {
-			callable(this._items[i]._key, this._items[i].value);
+			callable(this._items[i].key, this._items[i].value);
 		}
 	};
 
+	this.isList = function () {
+		return (function(items) {
+			var cmp = 0;
+			for(var i in items) {
+				if(cmp !== items[i].key) {
+					return false;
+				}
+				cmp = items[i].key + 1;
+			}
+			return true;
+		})(this.items());
+	};
 
 }
 Map.fromObject = function (obj) {
 	var mapInst = new Map;
 	for (var key in obj) {
 		mapInst.set(key, obj[key]);
+	}
+	return mapInst;
+};
+
+Map.fromArray = function (obj) {
+	var mapInst = new Map;
+	for (var i in obj) {
+		mapInst.set(null, obj[i]);
 	}
 	return mapInst;
 };

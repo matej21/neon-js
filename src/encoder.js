@@ -1,3 +1,7 @@
+var Entity = require('./entity');
+var Decoder = require('./decoder');
+var Map = require('./map');
+
 function encoder() {
 	BLOCK = 1;
 
@@ -12,75 +16,65 @@ function encoder() {
 			options = null;
 		}
 
-		if (xvar instanceof DateTime) {
+		if (xvar instanceof Date) {
 			return xvar.format('Y-m-d H:i:s O');
 
-		} else if (xvar instanceof Neon.Entity) {
+		} else if (xvar instanceof Entity) {
 			var attrs = '';
-			if (xval.attributes instanceof Array) {
-				attrs = this.encode(xval.attributes);
+			if (xvar.attributes !== null && typeof xvar.attributes === "object") {
+				attrs = this.encode(xvar.attributes);
 				attrs = attrs.substr(1, attrs.length - 2);
 			}
 			return this.encode(xvar.value) + "" + '(' + "" + attrs + "" + ')';
 		}
 
-		if (typeof xvar == 'object') {
-			var obj = xvar;
-			xvar = {};
-			for (var k in obj) {
-				var v = obj[k];
-				xvar[k] = v;
-			}
-		}
-
-		if (xvar instanceof Array) {
-			var isList = !xvar || (function (arr) {
-					var i = 0;
+		if (xvar !== null && typeof xvar == 'object') {
+			var isMap = xvar instanceof Map;
+			var isList = (xvar instanceof Array && (function (arr) {
+					var length = 0;
+					for (var i in arr) {
+						length++;
+					}
+					return length === arr.length;
+				})(xvar)) || (isMap && xvar.isList());
+			var s = '';
+			xvar = isMap ? xvar.items() : xvar;
+			if ((function (arr) {
 					for (key in arr) {
-						if (key != i) {
-							return false;
-						}
-						i++;
+						return false;
 					}
 					return true;
-				})(xvar);
-			var s = '';
-			if (options & encoder.BLOCK) {
-				if ((function (arr) {
-						for (key in arr) {
-							return false;
-						}
-						return true;
-					})(xvar)) {
-					return '[]';
+				})(xvar)) {
+				return '[]';
+			}
+			for (var i in xvar) {
+				if (isMap) {
+					var k = xvar[i].key;
+					var v = xvar[i].value;
+				} else {
+					var k = xvar instanceof Array ? parseInt(i) : i;
+					var v = xvar[i];
 				}
-				for (var k in xvar) {
-					var v = xvar[k];
+				if (options & encoder.BLOCK) {
 					v = this.encode(v, encoder.BLOCK);
 					s += (isList ? '-' : encoder.encode(k) + "" + ':')
 					+ "" + (v.indexOf("\n") === false ? ' ' + "" + v : "\n\t" + "" + v.replace("\n", "\n\t"))
 					+ "" + "\n";
-				}
-				return s;
-
-			} else {
-				for (var k in xvar) {
-					var v = xvar[k];
+				} else {
 					s += (isList ? '' : this.encode(k) + "" + ': ') + "" + this.encode(v) + "" + ', ';
 				}
+			}
+			if (options & encoder.BLOCK) {
+				return s;
+			} else {
 				return (isList ? '[' : '{') + "" + s.substr(0, s.length - 2) + "" + (isList ? ']' : '}');
 			}
 
 		} else if (typeof xvar == "string" && isNaN(xvar)
-			&& !preg_match('~[\x00-\x1F]|^\d{4}|^(true|false|yes|no|on|off|null)\z~i', xvar)
-			&& preg_match('~^' + "" + this.patterns[1] + "" + '\z~x', xvar) // 1 = literals
+			&& !xvar.match(/[\x00-\x1F]|^\d{4}|^(true|false|yes|no|on|off|null)$/i)
+			&& (new RegExp("^" + Decoder.patterns[1] + "$")).exec(xvar) // 1 = literals
 		) {
 			return xvar;
-
-		} else if (is_float(xvar)) {
-			xvar = JSON.stringify(xvar);
-			return xvar.indexOf('.') === -1 ? xvar + "" + '.0' : xvar;
-
 		} else {
 			return JSON.stringify(xvar);
 		}
@@ -89,4 +83,4 @@ function encoder() {
 
 }
 
-module.exports.encoder = encoder;
+module.exports = encoder;
