@@ -83,4 +83,12 @@ suite('Decoder.errors', function () {
 			neon.decode('- x: y:')
 		}, /Unexpected ':' on line 1, column 7./);
 	});
+
+	test('array-after-key scalar', function() {
+		assert.throws(function () {
+			neon.decode('\n' +
+			'foo:\n' +
+			'bar\n')
+		}, /Unexpected '<new line>' on line 3, column 4./);
+	});
 });

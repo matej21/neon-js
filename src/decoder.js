@@ -221,7 +221,7 @@ function decoder() {
 
 						} else if (hasKey) {
 							this.addValue(result, key, hasValue ? value : null);
-							if (key !== null && !hasValue && newIndent === indent) {
+							if (key !== null && !hasValue && newIndent === indent && typeof tokens[this.pos + 1] !== "undefined" && tokens[this.pos + 1][0] === "-") {
 								result.value.set(key, new Result);
 								result = result.value.get(key);
 							}
