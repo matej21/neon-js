@@ -20,4 +20,5 @@ module.exports.Entity = require('./entity');
 module.exports.Map = require('./map');
 module.exports.CHAIN = DecoderClass.CHAIN;
 module.exports.BLOCK = EncoderClass.BLOCK;
+module.exports.dumper = require('./dumper');
 module.exports.Error = require('./error');
