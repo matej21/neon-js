@@ -4,7 +4,7 @@ var Decoder = require('./decoder');
 
 function toText(xvar) {
 	if (xvar instanceof Date) {
-		return "(date) " + xvar.toJSON() + ")";
+		return "(date) " + xvar.toJSON();
 
 	} else if (xvar instanceof Entity) {
 		var attrs = '';
