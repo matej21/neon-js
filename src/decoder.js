@@ -1,7 +1,6 @@
 var Map = require("./map");
 var Entity = require("./entity");
 var NeonError = require('./error');
-var php = require("./php");
 
 
 function Result() {
@@ -42,11 +41,11 @@ function decoder() {
 		}
 		this.input = "\n" + "" + input.replace("\r", ""); // \n forces indent detection
 
-		var pattern = '~(' + "" + decoder.patterns.join(')|(') + "" + ')~mi';
-		this.tokens = php.preg_split(pattern, this.input, -1, 1 | 2 | 4);
+		var regexp = new RegExp('(' + "" + decoder.patterns.join(')|(') + "" + ')', 'mig');
+		this.tokens = this.split(regexp, this.input);
 
 		var last = this.tokens[this.tokens.length - 1];
-		if (this.tokens && !php.preg_match(pattern, last[0], [])) {
+		if (this.tokens && !regexp.test(last[0])) {
 			this.pos = this.tokens.length - 1;
 			this.error();
 		}
@@ -321,6 +320,40 @@ function decoder() {
 		var token = last ? last[0].substr(0, 40).replace("\n", '<new line>') : 'end';
 		throw new NeonError(message.replace("%s", token), line, col);
 	};
+
+
+	this.split = function (pattern, subject) {
+		/*
+		 Copyright (c) 2013 Kevin van Zonneveld (http://kvz.io)
+		 and Contributors (http://phpjs.org/authors)
+		 LICENSE: https://github.com/kvz/phpjs/blob/master/LICENSE.txt
+		 */
+		var result, ret = [], index = 0, i = 0;
+
+		var _filter = function (str, strindex) {
+			if (!str.length) {
+				return;
+			}
+			str = [str, strindex];
+			ret.push(str);
+		};
+		// Exec the pattern and get the result
+		while (result = pattern.exec(subject)) {
+			// Take the correct portion of the string and filter the match
+			_filter(subject.slice(index, result.index), index);
+			index = result.index + result[0].length;
+			// Convert the regexp result into a normal array
+			var resarr = Array.prototype.slice.call(result);
+			for (i = 1; i < resarr.length; i++) {
+				if (result[i] !== undefined) {
+					_filter(result[i], result.index + result[0].indexOf(result[i]));
+				}
+			}
+		}
+		// Filter last match
+		_filter(subject.slice(index, subject.length), index);
+		return ret;
+	}
 
 }
 
