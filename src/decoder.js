@@ -1,5 +1,6 @@
 var Map = require("./map");
 var Entity = require("./entity");
+var NeonError = require('./error');
 var php = require("./php");
 
 
@@ -318,7 +319,7 @@ function decoder() {
 		var line = text.split("\n").length - 1;
 		var col = offset - ("\n" + "" + text).lastIndexOf("\n") + 1;
 		var token = last ? last[0].substr(0, 40).replace("\n", '<new line>') : 'end';
-		throw new Error(message.replace("%s", token) + "" + " on line " + line + ", column " + col + ".");
+		throw new NeonError(message.replace("%s", token), line, col);
 	};
 
 }
