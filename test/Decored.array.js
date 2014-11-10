@@ -3,6 +3,7 @@ var assertNeon = require('../src/assert');
 var neon = require('../src/neon');
 
 suite('Decoder.array', function () {
+
 	test('empty list', function () {
 		assertNeon.equal({
 			a: {}
@@ -177,5 +178,43 @@ suite('Decoder.array', function () {
 			"null : 42\n"
 		))
 	});
-})
-;
+
+	test('empty-line-before-value: 1', function() {
+		assertNeon.equal({
+			x: "y"
+		}, neon.decode(
+			"\n" +
+			"x:\n" +
+			"\ty\n"
+		))
+	});
+
+	test('empty-line-before-value: 2', function () {
+		assertNeon.equal({
+			0: {x: "y"}
+		}, neon.decode(
+			"\n" +
+			"-\n" +
+			"\tx:\n" +
+			"\t y\n"
+		))
+	});
+	test('empty-line-before-value: 3', function () {
+		assertNeon.equal({
+			x: {0: 1, 1: 2, 2: 3}
+		}, neon.decode(
+			"\n" +
+			"x:\n" +
+			"    [1, 2, 3]\n"
+		))
+	});
+	test('empty-line-before-value: 4', function () {
+		assertNeon.equal({
+			0: "a"
+		}, neon.decode(
+			"\n" +
+			"-\n" +
+			"    a\n"
+		))
+	});
+});

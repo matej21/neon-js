@@ -288,7 +288,7 @@ function decoder() {
 			}
 		} else {
 			if (hasValue && !hasKey) { // block items must have "key"
-				if (result.value === null) { //if empty
+				if (result.value === null || (result.value instanceof Map && result.value.length == 0)) { //if empty
 					return value; // simple value parser
 				} else {
 					this.error();
