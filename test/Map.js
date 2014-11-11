@@ -77,4 +77,11 @@ suite('Map', function () {
 		mapInst.set("foo", nested);
 		assert.deepEqual({foo: {bar: 1}}, mapInst.toObject(true));
 	});
+
+	test('number index', function () {
+		var mapInst = new Map();
+		mapInst.set(0, "a");
+		mapInst.set(null, "b");
+		assert.deepEqual({0: "a", 1: "b"}, mapInst.toObject());
+	});
 });

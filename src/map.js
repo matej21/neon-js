@@ -14,7 +14,7 @@ function Map() {
 			key = this._key++;
 		} else {
 			var number = parseInt(key * 1);
-			if (!isNaN(number) && number > this._key) {
+			if (!isNaN(number) && number >= this._key) {
 				this._key = number + 1;
 			}
 		}
