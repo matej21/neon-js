@@ -253,16 +253,17 @@ function decoder() {
 						'null': 0, 'Null': 0, 'NULL': 0
 					};
 				if (t[0] === '"') {
-					value = t.substr(1, t.length - 2).replace(/#\\\\(?:u[0-9a-f]{4}|x[0-9a-f]{2}|.)/i, function (whole, sq) {
+					var self = this;
+					value = t.substr(1, t.length - 2).replace(/\\(?:u[0-9a-f]{4}|x[0-9a-f]{2}|.)/i, function (match) {
 						var mapping = {'t': "\t", 'n': "\n", 'r': "\r", 'f': "\x0C", 'b': "\x08", '"': '"', '\\': '\\', '/': '/', '_': "\xc2\xa0"};
-						if (mapping[sq[1]] !== undefined) {
-							return mapping[sq[1]];
-						} else if (sq[1] === 'u' && sq.length === 6) {
+						if (mapping[match[1]] !== undefined) {
+							return mapping[match[1]];
+						} else if (match[1] === 'u' && match.length === 6) {
 							return String.fromCharCode(parseInt(sq.substr(2), 16));
-						} else if (sq[1] === 'x' && sq.length === 4) {
-							return String.fromCharCode(parseInt(sq.substr(2), 16));
+						} else if (match[1] === 'x' && match.length === 4) {
+							return String.fromCharCode(parseInt(match.substr(2), 16));
 						} else {
-							this.error("Invalid escaping sequence " + sq + "");
+							self.error("Invalid escaping sequence " + match + "");
 						}
 					});
 				} else if (t[0] === "'") {
@@ -358,7 +359,7 @@ function decoder() {
 }
 
 decoder.patterns = [
-	"'[^'\\n]*'|\"(?:\\.|[^\"\\\\\\n])*\"",
+	"'[^'\\n]*'|\"(?:\\\\.|[^\"\\\\\\n])*\"",
 	"(?:[^\\x00-\\x20#\"',:=[\\]{}()!`-]|[:-][^\"',\\]})\\s])(?:[^\\x00-\\x20,:=\\]})(]+|:(?![\\s,\\]})]|$)|[\\ \\t]+[^\\x00-\\x20#,:=\\]})(])*",
 	"[,:=[\\]{}()-]",
 	"?:\\#.*",

@@ -39,10 +39,13 @@ suite('Decoder.scalar', function () {
 		assert.equal('the"string', neon.decode('the"string #literal'));
 	});
 	test('literal 3', function () {
-		assert.equal("the'string#literal", neon.decode("the'string#literal"));
+		assert.equal("the'string #literal", neon.decode('"the\'string #literal"'));
 	});
 	test('literal 4', function () {
-		assert.equal("the'string", neon.decode("the'string #literal"));
+		assert.equal('the"string #literal', neon.decode("'the\"string #literal'"));
+	});
+	test('literal 5', function () {
+		assert.equal('the"string #literal', neon.decode('"the\\"string #literal"'));
 	});
 	test('literal 5', function () {
 		assert.equal("<literal> <literal>", neon.decode("<literal> <literal>"));
