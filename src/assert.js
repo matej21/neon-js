@@ -2,7 +2,7 @@ var mainAssert = require('assert');
 var Map = require('./map');
 var Entity = require('./entity');
 
-module.exports.equal = function (expected, actual) {
+module.exports.equal = function (actual, expected) {
 	var mapToObject = function (value) {
 		if (value instanceof Map) {
 			var obj = {};
@@ -17,5 +17,5 @@ module.exports.equal = function (expected, actual) {
 
 		return value;
 	};
-	return mainAssert.deepEqual(expected, mapToObject(actual));
+	return mainAssert.deepEqual(mapToObject(actual), expected);
 };
