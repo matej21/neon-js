@@ -126,7 +126,7 @@ function decoder() {
 				} else if (hasKey && key == null && hasValue && !inlineParser) {
 					this.pos++;
 					this.addValue(result, null, this.parse(indent + "" + '  ', new Map(), value, true));
-					var newIndent = (tokens[this.pos], tokens[this.pos + 1]) ? tokens[this.pos][0].substr(1) : ''; // not last
+					var newIndent = (typeof tokens[this.pos] !== "undefined" && typeof tokens[this.pos + 1] !== "undefined") ? tokens[this.pos][0].substr(1) : ''; // not last
 					if (newIndent.length > indent.length) {
 						this.pos++;
 						this.error('Bad indentation');
