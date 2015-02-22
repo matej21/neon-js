@@ -83,4 +83,9 @@ suite('Decoder.scalar', function () {
 	test('BOM!', function () {
 		assert.equal(neon.decode('\xEF\xBB\xBFa'), "a");
 	});
+	test('unicode', function () {
+		assert.equal(neon.decode('"\\u0040"'), '@');
+		assert.equal(neon.decode('"\\u011B"'), "\u011B");
+
+	});
 });

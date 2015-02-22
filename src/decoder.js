@@ -259,7 +259,7 @@ function decoder() {
 						if (mapping[match[1]] !== undefined) {
 							return mapping[match[1]];
 						} else if (match[1] === 'u' && match.length === 6) {
-							return String.fromCharCode(parseInt(sq.substr(2), 16));
+							return String.fromCharCode(parseInt(match.substr(2), 16));
 						} else if (match[1] === 'x' && match.length === 4) {
 							return String.fromCharCode(parseInt(match.substr(2), 16));
 						} else {
