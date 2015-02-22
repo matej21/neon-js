@@ -1,3 +1,5 @@
+'use strict';
+
 var mainAssert = require('assert');
 var Map = require('./map');
 var Entity = require('./entity');

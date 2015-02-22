@@ -1,3 +1,5 @@
+'use strict';
+
 var assert = require('assert');
 var neon = require('../src/neon');
 suite('Decoder.errors', function () {

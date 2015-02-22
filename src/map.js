@@ -1,4 +1,4 @@
-var Entity = require('./entity');
+'use strict';
 
 function Map() {
 	this._items = [];

@@ -1,3 +1,5 @@
+'use strict';
+
 var assert = require('assert');
 var assertNeon = require('../src/assert');
 var neon = require('../src/neon');

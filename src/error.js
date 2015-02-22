@@ -1,3 +1,5 @@
+'use strict';
+
 function NeonError(message, line, column) {
 	this.name = this.constructor.name;
 	this.message = message + " on line " + line + ", column " + column + ".";

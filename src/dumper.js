@@ -1,3 +1,5 @@
+'use strict';
+
 var Map = require('./map');
 var Entity = require('./entity');
 var Decoder = require('./decoder');
@@ -18,7 +20,7 @@ function toText(xvar) {
 	if (xvar instanceof Map) {
 		var s = "array (" + xvar.length + ")\n";
 		xvar.forEach(function (key, val) {
-			value = toText(val);
+			var value = toText(val);
 			s += "\t" + (toText(key) + " => ")
 			+ "" + (value.indexOf("\n") === -1 ? ("" + value) : value.replace(/\n/g, "\n\t"))
 			+ "" + "\n";

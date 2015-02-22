@@ -1,3 +1,5 @@
+'use strict';
+
 var Map = require("./map");
 var Entity = require("./entity");
 var NeonError = require('./error');

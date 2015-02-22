@@ -1,3 +1,5 @@
+'use strict';
+
 var Entity = require('./entity');
 var Decoder = require('./decoder');
 var Map = require('./map');
@@ -38,7 +40,7 @@ function encoder() {
 			var s = '';
 			xvar = isMap ? xvar.items() : xvar;
 			if ((function (arr) {
-					for (key in arr) {
+					for (var key in arr) {
 						return false;
 					}
 					return true;

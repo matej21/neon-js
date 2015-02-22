@@ -1,3 +1,5 @@
+'use strict';
+
 var EncoderClass = require("./encoder");
 var DecoderClass = require("./decoder");
 var encode = function (xvar, options) {
