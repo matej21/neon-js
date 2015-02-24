@@ -256,7 +256,7 @@ function decoder() {
 					};
 				if (t[0] === '"') {
 					var self = this;
-					value = t.substr(1, t.length - 2).replace(/\\(?:u[0-9a-f]{4}|x[0-9a-f]{2}|.)/i, function (match) {
+					value = t.substr(1, t.length - 2).replace(/\\(?:u[0-9a-f]{4}|x[0-9a-f]{2}|.)/gi, function (match) {
 						var mapping = {'t': "\t", 'n': "\n", 'r': "\r", 'f': "\x0C", 'b': "\x08", '"': '"', '\\': '\\', '/': '/', '_': "\xc2\xa0"};
 						if (mapping[match[1]] !== undefined) {
 							return mapping[match[1]];

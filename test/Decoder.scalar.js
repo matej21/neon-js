@@ -88,6 +88,7 @@ suite('Decoder.scalar', function () {
 	test('unicode', function () {
 		assert.equal(neon.decode('"\\u0040"'), '@');
 		assert.equal(neon.decode('"\\u011B"'), "\u011B");
+		assert.equal(neon.decode('"\\uD834\\uDF06"'), '\uD834\uDF06');
 
 	});
 });
