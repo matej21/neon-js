@@ -17,7 +17,10 @@ function Result() {
 }
 
 
-function decoder() {
+function decoder(output) {
+	if (typeof output === "undefined") {
+		output = decoder.MAP;
+	}
 
 	/** @var array */
 	this.tokens = [];
@@ -69,11 +72,28 @@ function decoder() {
 				res.attributes = flatten(res.attributes);
 				res.value = flatten(res.value);
 			} else if (res instanceof Map) {
-				var result = new Map;
-				res.forEach(function (key, value) {
-					result.set(key, flatten(value));
-				});
-				return result;
+				if (output === decoder.FORCE_OBJECT) {
+					var obj = {};
+					res.forEach(function (key, value) {
+						obj[key] = flatten(value);
+					});
+					return obj;
+				} else {
+					var result = new Map;
+					var isList = true;
+					var cmp = 0;
+					res.forEach(function (key, value) {
+						result.set(key, flatten(value));
+						if (key !== cmp++) {
+							isList = false;
+						}
+					});
+					if (output === decoder.MAP) {
+						return result;
+					} else {
+						return isList ? result.values() : result.toObject();
+					}
+				}
 			}
 			return res;
 
@@ -374,5 +394,10 @@ decoder.brackets = {
 	'(': ')'
 };
 decoder.CHAIN = '!!chain';
+
+decoder.MAP = 'map';
+decoder.AUTO = 'auto';
+decoder.FORCE_OBJECT = 'object';
+
 
 module.exports = decoder;

@@ -1,6 +1,7 @@
 'use strict';
 
 var assertNeon = require('../src/assert');
+var assert = require('assert');
 var neon = require('../src/neon');
 
 suite('Decoder.array', function () {
@@ -218,4 +219,29 @@ suite('Decoder.array', function () {
 			0: "a"
 		})
 	});
+
+	test('output-map', function() {
+		assert.ok(neon.decode("foo: bar") instanceof neon.Map);
+	});
+
+	test('output-object', function() {
+		assert.deepEqual(neon.decode(
+			"\n" +
+			"foo: {bar: lorem, ipsum}\n" +
+			"- [dolor]", neon.OUTPUT_OBJECT
+		), {
+			foo: {bar: "lorem", 0: "ipsum"},
+			0: {0: "dolor"}
+		});
+	});
+
+	test('output-auto', function() {
+		assert.deepEqual(neon.decode(
+			"\n" +
+			"- {foo: bar}\n" +
+			"- [lorem, 2: ipsum]\n" +
+			"- dolor\n", neon.OUTPUT_AUTO
+		), [{foo: "bar"}, {0: "lorem", 2: "ipsum"}, "dolor"]);
+	});
+
 });
