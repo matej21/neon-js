@@ -6,6 +6,8 @@ function NeonError(message, line, column) {
 	this.line = line;
 	this.column = column;
 	this.constructor.prototype.__proto__ = Error.prototype;
-	Error.captureStackTrace(this, this.constructor);
+	if (typeof Error.captureStackTrace !== "undefined") {
+		Error.captureStackTrace(this, this.constructor);
+	}
 }
 module.exports = NeonError;
