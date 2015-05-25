@@ -10,8 +10,8 @@ suite('Map', function () {
 	test('set', function () {
 		var mapInst = new Map();
 		mapInst.set("foo", "bar");
-		assert.equal(mapInst.get("foo"), "bar");
-		assert.equal(mapInst.length, 1);
+		assert.strictEqual(mapInst.get("foo"), "bar");
+		assert.strictEqual(mapInst.length, 1);
 	});
 	test('add', function () {
 		var mapInst = new Map();
@@ -25,16 +25,16 @@ suite('Map', function () {
 		assert.ok(mapInst.has("foo"));
 		mapInst.remove("foo");
 		assert.ok(!mapInst.has("foo"));
-		assert.equal(mapInst.length, 0);
+		assert.strictEqual(mapInst.length, 0);
 	});
 	test('values, keys, items', function () {
 		var mapInst = new Map();
 		for (var i in testItems) {
 			mapInst.set(testItems[i][0], testItems[i][1]);
 		}
-		assert.equal(mapInst.values().length, 4);
-		assert.equal(mapInst.keys().length, 4);
-		assert.equal(mapInst.items().length, 4);
+		assert.strictEqual(mapInst.values().length, 4);
+		assert.strictEqual(mapInst.keys().length, 4);
+		assert.strictEqual(mapInst.items().length, 4);
 	});
 
 	test('order', function () {
@@ -44,11 +44,11 @@ suite('Map', function () {
 		}
 		var values = mapInst.values();
 		for (var i in values) {
-			assert.equal(values[i], testItems[i][1]);
+			assert.strictEqual(values[i], testItems[i][1]);
 		}
 		var keys = mapInst.keys();
 		for (var i in keys) {
-			assert.equal(keys[i], testItems[i][0]);
+			assert.strictEqual(keys[i], testItems[i][0]);
 		}
 	});
 
@@ -59,8 +59,8 @@ suite('Map', function () {
 		}
 		var i = 0;
 		mapInst.forEach(function (key, value) {
-			assert.equal(key, testItems[i][0]);
-			assert.equal(value, testItems[i][1]);
+			assert.strictEqual(key, testItems[i][0]);
+			assert.strictEqual(value, testItems[i][1]);
 			i++;
 		});
 	});

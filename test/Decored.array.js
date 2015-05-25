@@ -244,4 +244,14 @@ suite('Decoder.array', function () {
 		), [{foo: "bar"}, {0: "lorem", 2: "ipsum"}, "dolor"]);
 	});
 
+	test('empty-arrays', function () {
+		assertNeon.equal(neon.decode(
+			"\n" +
+			"one:\n" +
+			"two:\n"
+		), {
+			one: null,
+			two: null
+		});
+	});
 });
