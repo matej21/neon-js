@@ -94,5 +94,12 @@ suite('Encoder', function () {
 		"	- 1\n" +
 		"	- 2\n");
 	});
+	test('block 6', function () {
+		assert.strictEqual(neon.encode({a: {foo1: {lorem: 1}, foo2: {lorem: 2}}}, neon.BLOCK), "a:\n" +
+			"	foo1:\n" +
+			"		lorem: 1\n" +
+			"	foo2:\n" +
+			"		lorem: 2\n");
+	});
 
 });

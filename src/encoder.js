@@ -58,14 +58,14 @@ function encoder() {
 				if (options & encoder.BLOCK) {
 					v = this.encode(v, encoder.BLOCK);
 					s += (isList ? '-' : this.encode(k) + "" + ':')
-					+ "" + (v.indexOf("\n") === -1 ? (' ' + "" + v) : "\n\t" + "" + v.replace("\n", "\n\t"))
+					+ "" + (v.indexOf("\n") === -1 ? (' ' + "" + v) : "\n\t" + "" + v.replace(/\n/g, "\n\t"))
 					+ "" + "\n";
 				} else {
 					s += (isList ? '' : this.encode(k) + "" + ': ') + "" + this.encode(v) + "" + ', ';
 				}
 			}
 			if (options & encoder.BLOCK) {
-				return s.trim() + "\n";
+				return s.trim().replace(/^\s*\n/gm, '') + "\n";
 			} else {
 				return (isList ? '[' : '{') + "" + s.substr(0, s.length - 2) + "" + (isList ? ']' : '}');
 			}
