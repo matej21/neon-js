@@ -70,16 +70,25 @@ function encoder() {
 				return (isList ? '[' : '{') + "" + s.substr(0, s.length - 2) + "" + (isList ? ']' : '}');
 			}
 
-		} else if (typeof xvar == "string" && isNaN(xvar)
-			&& !xvar.match(/[\x00-\x1F]|^\d{4}|^(true|false|yes|no|on|off|null)$/i)
-			&& (new RegExp("^" + Decoder.patterns[1] + "$")).exec(xvar) // 1 = literals
-		) {
+		} else if (this.isLiteral(xvar)) {
 			return xvar;
 		} else {
 			return JSON.stringify(xvar);
 		}
 	};
 
+	this.isLiteral = function (value) {
+		if (typeof value !== "string" || !isNaN(value)) {
+			return false;
+		}
+		if (value.match(/[\x00-\x1F]|^\d{4}|^(true|false|yes|no|on|off|null)$/i)) {
+			return false;
+		}
+		var result = (new RegExp("^" + Decoder.patterns[1])).exec(value);
+
+		return result && result[0].length === value.length;
+
+	}
 
 }
 encoder.BLOCK = 1;

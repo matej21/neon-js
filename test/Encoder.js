@@ -102,4 +102,14 @@ suite('Encoder', function () {
 			"		lorem: 2\n");
 	});
 
+	test('sentence', function () {
+		assert.strictEqual(neon.encode("Sed tempus eu tortor sagittis commodo. Phasellus luctus pharetra lectus, at vulputate ex."),
+			"\"Sed tempus eu tortor sagittis commodo. Phasellus luctus pharetra lectus, at vulputate ex.\"")
+	});
+
+	test('sentence no comma', function () {
+		assert.strictEqual(neon.encode("Sed tempus eu tortor sagittis commodo. Phasellus luctus pharetra lectus at vulputate ex."),
+			"Sed tempus eu tortor sagittis commodo. Phasellus luctus pharetra lectus at vulputate ex.")
+	});
+
 });
