@@ -44,6 +44,18 @@ suite('Decoder.inline.array', function () {
 			f: null
 		});
 	});
+
+	test('5 - crlf', function () {
+		assertNeon.equal(neon.decode("{a,\r\nb\r\nc: 1,\r\nd: 1,\r\n\r\ne: 1\r\nf:\r\n}"), {
+			0: "a",
+			1: "b",
+			c: 1,
+			d: 1,
+			e: 1,
+			f: null
+		});
+	});
+
 	test('entity 1', function () {
 		assert.ok(neon.decode("@item(a, b)") instanceof neon.Entity);
 	});

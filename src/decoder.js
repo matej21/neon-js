@@ -44,7 +44,7 @@ function decoder(output) {
 		} else if (input.substr(0, 3) == "\xEF\xBB\xBF") { // BOM
 			input = input.substr(3);
 		}
-		this.input = "\n" + "" + input.replace("\r", ""); // \n forces indent detection
+		this.input = "\n" + "" + input.replace(/\r\n/g, "\n"); // \n forces indent detection
 
 		var regexp = new RegExp('(' + "" + decoder.patterns.join(')|(') + "" + ')', 'mig');
 		this.tokens = this.split(regexp, this.input);
