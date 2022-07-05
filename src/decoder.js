@@ -128,11 +128,34 @@ function decoder(output) {
 		var tokens = this.tokens;
 		var count = tokens.length;
 		var mainResult = result;
+		var hasMultiline = false;
+		var multilineLineCol = [];
 
 		for (; this.pos < count; this.pos++) {
 			var t = tokens[this.pos][0];
 
-			if (t === ',') { // ArrayEntry separator
+			if (t === '\'\'\'\n') // start multiline
+			{
+				if (!hasKey || inlineParser) {
+					this.error();
+				}
+				hasMultiline = true;
+				value = '';
+				multilineLineCol = this.lineCol();
+			}
+			else if (t === '\n\'\'\'') // end multiline
+			{
+				if (!hasKey ||!hasValue || inlineParser) {
+					this.error();
+				}
+				hasMultiline = false;
+			}
+			else if (hasMultiline)
+			{
+				value += t;
+				hasValue = true;
+			}
+			else if (t === ',') { // ArrayEntry separator
 				if ((!hasKey && !hasValue) || !inlineParser) {
 					this.error();
 				}
@@ -315,6 +338,8 @@ function decoder(output) {
 				} else {
 					this.error();
 				}
+			} else if (hasKey && hasMultiline) {
+				this.error("Missing multiline closing tag from line "+ multilineLineCol[0]);
 			} else if (hasKey) {
 				this.addValue(result, key, hasValue ? value : null);
 			}
@@ -336,12 +361,18 @@ function decoder(output) {
 		}
 
 		var last = this.tokens[this.pos] !== undefined ? this.tokens[this.pos] : null;
+		var [ line, col ] = this.lineCol();
+		var token = last ? last[0].substr(0, 40).replace("\n", '<new line>') : 'end';
+		throw new NeonError(message.replace("%s", token), line, col);
+	};
+
+	this.lineCol = function() {
+		var last = this.tokens[this.pos] !== undefined ? this.tokens[this.pos] : null;
 		var offset = last ? last[1] : this.input.length;
 		var text = this.input.substr(0, offset);
 		var line = text.split("\n").length - 1;
 		var col = offset - ("\n" + "" + text).lastIndexOf("\n") + 1;
-		var token = last ? last[0].substr(0, 40).replace("\n", '<new line>') : 'end';
-		throw new NeonError(message.replace("%s", token), line, col);
+		return [ line, col ];
 	};
 
 
@@ -381,6 +412,7 @@ function decoder(output) {
 }
 
 decoder.patterns = [
+	"(?:\\'\\'\\'\\n|\\n\\'\\'\\')",
 	"'[^'\\n]*'|\"(?:\\\\.|[^\"\\\\\\n])*\"",
 	"(?:[^\\x00-\\x20#\"',:=[\\]{}()!`-]|[:-][^\"',\\]})\\s])(?:[^\\x00-\\x20,:=\\]})(]+|:(?![\\s,\\]})]|$)|[\\ \\t]+[^\\x00-\\x20#,:=\\]})(])*",
 	"[,:=[\\]{}()-]",

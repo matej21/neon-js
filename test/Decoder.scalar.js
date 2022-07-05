@@ -1,6 +1,7 @@
 'use strict';
 
 var assert = require('assert');
+var assertNeon = require('../src/assert');
 var neon = require('../src/neon');
 
 suite('Decoder.scalar', function () {
@@ -90,5 +91,10 @@ suite('Decoder.scalar', function () {
 		assert.strictEqual(neon.decode('"\\u011B"'), "\u011B");
 		assert.strictEqual(neon.decode('"\\uD834\\uDF06"'), '\uD834\uDF06');
 
+	});
+	test('multiline string', function () {
+		assertNeon.equal(neon.decode('"multi":\'\'\'\none line\nsecond line\n\'\'\''), {
+			"multi": "one line\nsecond line"
+		});
 	});
 });
