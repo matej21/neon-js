@@ -84,7 +84,7 @@ function encoder() {
 		if (value.match(/[\x00-\x1F]|^\d{4}|^(true|false|yes|no|on|off|null)$/i)) {
 			return false;
 		}
-		var result = (new RegExp("^" + Decoder.patterns[1])).exec(value);
+		var result = (new RegExp("^" + Decoder.patterns[2])).exec(value);
 
 		return result && result[0].length === value.length;
 
